@@ -1,0 +1,116 @@
+#####   CLEANING   #####
+
+configfile: "config.yaml"
+
+# rule all:
+#     input:
+#         expand("data/clean/reads/{sample}.{insert}.fq.gz", sample=config["sample"], insert=config["insert"])
+
+rule preassembly_index:
+    conda:
+        "../envs/cleaning.yaml"
+    input:
+        expand("data/spades/{sample}.{large}/scaffolds.fasta.fake", sample=config["sample"], large=config["large"])
+    output:
+        "data/contaminants/index/{sample}.scaffolds.fai"
+    shell:
+        "samtools faidx \
+        {input} && \
+        mv \
+        {input}.fai \
+        {output}"
+
+rule listing_contam_contigs:
+    conda:
+        "../envs/cleaning.yaml"
+    input:
+        "reports/blobtools/{sample}.{insert}/blobDB.table.txt"
+    output:
+        "tmp/cleaning/{sample}.{insert}.contam_contigs.txt"
+    shell:
+        "grep -v 'no-hit' {input} | cat > {output}"
+
+rule listing_contam_contigs2:
+    conda:
+        "../envs/cleaning.yaml"
+    input:
+        "tmp/cleaning/{sample}.{insert}.contam_contigs.txt"
+    output:
+        "reports/contaminants/{sample}.{insert}.scaff.contams.contigs"
+    shell:
+        "grep -v 'Nematoda' {input} | cut -f1 > {output}"
+
+
+rule removing_contam_contigs:
+    input:
+        index="data/contaminants/index/{sample}.scaffolds.fai",
+	contams="reports/contaminants/{sample}.{insert}.scaff.contams.contigs"
+    output:
+        "data/clean/index/{sample}.{insert}.scaff.fasta.fai"
+    shell:
+        "grep -v -f {input.contams} {input.index} > {output}"
+
+
+rule pulling_clean_contigs:
+    conda:
+        "../envs/cleaning.yaml"
+    input:
+        index="data/clean/index/{sample}.{insert}.scaff.fasta.fai",
+        bam="data/mapped/sorted/{sample}.{insert}.sorted"
+    output:
+        "data/clean/{sample}.{insert}.bam"
+    threads:
+        28
+    shell:
+        "samtools view \
+        -t \
+        {input.index} \
+        -@ {threads} \
+        -bS \
+        -F12 \
+        {input.bam} \
+        > {output}"
+
+
+rule transformation:
+    conda:
+        "../envs/cleaning.yaml"
+    input:
+        "data/clean/{sample}.{insert}.bam"
+    output:
+        "tmp/{sample}.{insert}.bam"
+    threads:
+        28
+    shell:
+        "samtools view \
+        -uf64 \
+        {input} \
+        > {output}"
+
+
+rule bam2fq:
+    conda:
+        "../envs/cleaning.yaml"
+    input:
+        "tmp/{sample}.{insert}.bam"
+    output:
+        read1="tmp/{sample}.{insert}.fq"
+    threads:
+        28
+    shell:
+        "samtools bam2fq \
+        {input} \
+        > {output}"
+
+rule zipping_fq:
+    input:
+        "tmp/{sample}.{insert}.fq"
+    output:
+        "data/clean/reads/{sample}.{insert}.fq.gz"
+    threads:
+        28
+    shell:
+        "gzip \
+        -c \
+        {input} \
+        > {output}"

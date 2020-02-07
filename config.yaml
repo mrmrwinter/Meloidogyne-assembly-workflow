@@ -1,0 +1,70 @@
+sample: "Mhap"
+#DENOTE THREADS
+threads: "28"
+
+ram: "500"
+
+FR: ["1","2"]
+
+## Though the glob_wildcards function can be used to make the workflow iterate through a series of files
+## from different organisms in the data directory, for ease of use this workflow has been built to only assembly one species at a time
+
+#DENOTE THE SAMPLE
+
+
+#DENOTE EITHER INSERT SIZE
+#this will be done with glob as the insert sizes can vary depending on raw data
+insert: ["0014", "0058"]
+
+large: ["0014"]
+
+#DENOTE READ
+R: ["R1", "R2"]
+
+#LISTED CONTAMINANTS FOR REMOVAL
+CONTAMS: ["Bacteria", "Homo", "Pan", "Solunum"]
+
+
+small: ["0058"]
+
+
+#THE OUTPUTS OF CERTAIN RULES NEED TO BE COLLECTED IN A WILDCARD
+## These wildcards will be generated here, in the order they appear in the Snakefile
+
+#for trimmomatic
+trimbin: ["1P", "2P", "1U", "2U"]
+
+#for spades
+spades_out: [directory("corrected"), directory("K21"), directory("K33"), directory("K55"), directory("misc"), \
+directory("tmp"), "assembly_graph_with_scaffolds.gfa", "assembly_graph.fastg", "dataset.info", "params.txt", \
+"input_dataset.yaml",  "scaffolds.fasta", "before_rr.fasta", "scaffolds.paths", "contigs.fasta", "spades.log"]
+
+#for blobtools create
+bcreate_out: ["gc.json", "identifiers.json", "length.json", "meta.json", "ncount.json"]
+
+#for blobtools
+blob_out: ["bestsum.phylum.p7.span.100.blobplot.bam0.png", "bestsum.phylum.p7.span.100.blobplot.covsum.png", \
+"bestsum.phylum.p7.span.100.blobplot.read_cov.bam0.png", "bestsum.phylum.p7.span.100.blobplot.read_cov.covsum.png", \
+"bestsum.phylum.p7.span.100.blobplot.spades.png"]
+
+#for platanus assemble
+plat_out: ["_contig.fa", "_contigBubble.fa", "_32merFrq.tsv"]
+
+phase_out: ["_allPhaseBlock.fa", "_primaryBubble.fa", "_secondaryBubble.fa", "_nonBubbleHomoCandidate.fa", "_nonBubbleHetero.fa", directory("_intermediateResults")]
+
+consensus_out: ["_consensusScaffold.fa", "_consensusScaffoldComponent.bed"]
+
+# #for platanus scaffold
+# scaff_out: ["_scaffold.fa", "_scaffoldBubble.fa", "_scaffoldComponent.tsv"]
+
+#for bwa index
+bwa_ind: [".amb", ".ann", ".bwt", ".pac", ".sa"]
+
+
+#for trimmomatic
+trimbin: ["1P", "2P", "1U", "2U"]
+
+#for platanus
+plat_out: ["_contig.fa","_contigBubble.fa","_kmerFrq.tsv"]
+platscaff_out: ["_scaffold.fa","scaffoldBubble.fa"]
+

@@ -1,0 +1,61 @@
+#####   CONTAMINATION DETECTION   #####
+
+configfile: "config.yaml"
+
+# rule all:
+#     input:
+#         expand("reports/blobtools/{sample}.{insert}/blobDB.json", sample=config["sample"], insert=config["insert"]),
+#         expand("reports/blobtools/{sample}.{insert}/blobDB.table.txt", sample=config["sample"], insert=config["insert"]),
+#         expand("reports/blobtools/{sample}.{insert}/blobDB.json.bestsum.phylum.p8.span.100.blobplot.bam0.png0", sample=config["sample"], insert=config["insert"])
+
+rule blobtools_create:
+    conda:
+        "../envs/blobtools.yaml"
+    input:
+        contigs=expand("data/spades/{sample}.{large}/scaffolds.fasta.fake", sample=config["sample"], large=config["large"]),
+        mapping="data/mapped/sorted/{sample}.{insert}.sorted",
+        hits="reports/blast/{sample}.blast.out"
+    output:
+        "reports/blobtools/{sample}.{insert}/blobDB.json"
+    params:
+        out="reports/blobtools/{sample}.{insert}/"
+    threads:
+        28
+    shell:
+        "./blobtools/blobtools create \
+        -i {input.contigs} \
+        -b {input.mapping} \
+        -t {input.hits} \
+        -o {params.out}"
+
+rule blobtools_view:
+    conda:
+        "../envs/blobtools.yaml"
+    input:
+        "reports/blobtools/{sample}.{insert}/blobDB.json"
+    output:
+        "reports/blobtools/{sample}.{insert}/blobDB.table.txt"
+    params:
+        out="reports/blobtools/{sample}.{insert}/"
+    threads:
+        28
+    shell:
+        "./blobtools/blobtools view \
+        -i {input} \
+        --out {params.out}"
+
+rule blobtools_plot:
+    conda:
+        "../envs/blobtools.yaml"
+    input:
+        "reports/blobtools/{sample}.{insert}/blobDB.json"
+    output:
+        "reports/blobtools/{sample}.{insert}/blobDB.json.bestsum.phylum.p8.span.100.blobplot.bam0.png"
+    params:
+        out="reports/blobtools/{sample}.{insert}/"
+    threads:
+        28
+    shell:
+        "./blobtools/blobtools plot \
+        -i {input} \
+        --out {params.out}"

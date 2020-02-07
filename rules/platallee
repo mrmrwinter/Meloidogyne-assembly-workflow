@@ -1,0 +1,61 @@
+ #######  PLATANUS ALLEE  ########
+
+configfile: "config.yaml"
+
+rule all:
+    input:
+        expand(""
+
+
+rule platallee_assemble:
+    input:
+        expand("data/clean_contigs/{sample}.{insert}.fq.gz", sample=config["sample"], insert=["insert"]),
+    output:
+        "data/platallee/assemble/{sample}/{sample}_contig.fa",
+        "data/platallee/assemble/{sample}/{sample}_junctionKmer.fa",
+        "data/platallee/assemble/{sample}/{sample}_kmerFrq.tsv"
+    params:
+        out="data/platallee/assemble/{sample}/{sample}",
+        report="reports/platallee/assemble.log"
+    shell:
+        "platanus_allee assemble \
+        -o {params.out} \
+        -f {input} \
+        -t {threads} \
+        -m 40 \
+        2>{params.report}"
+
+
+## Platanus-allee phase
+rule platallee_phase:
+    input:
+        contigs="data/platallee/assemble/{sample}/{sample}_contig.fa",
+        reads1="data/clean_contigs/{sample}.0014.cleaned.fq.gz",                          ### this needs fixing but should work for now
+        reads2="data/clean_contigs/{sample}.0058.cleaned.fq.gz"
+    output:
+        "data/platallee/phase/{sample}/{sample}_allPhaseBlock.fa",
+        "data/platallee/phase/{sample}/{sample}_primaryBubble.fa",
+        "data/platallee/phase/{sample}/{sample}_secondaryBubble.fa",
+        "data/platallee/phase/{sample}/{sample}_nonBubbleHomoCandidate.fa",
+        "data/platallee/phase/{sample}/{sample}_nonBubbleHetero.fa",
+        directory("data/platallee/phase/{sample}/{sample}_intermediateResults")
+    params:
+        prefix="data/platallee/phase/{sample}/{sample}"
+    threads:
+        28
+    shell:
+        "platanus_allee phase -o {params.prefix} -c {input.contigs} -IP1 {input.reads1} -IP2 {input.reads2} -t {threads} 2>log"
+
+
+
+##Platanus-allee consensus
+rule platallee_consensus:
+    input:
+        contigs="data/platallee/assemble/{sample}/{sample}_contig.fa",
+    output:
+        "data/platallee/consensus/{sample}/{sample}_consensusScaffold.fa",
+        "data/platallee/consensus/{sample}/{sample}_consensusScaffoldComponent.bed"
+    params:
+        prefix="data/platallee/phase/{sample}/{sample}"
+    shell:
+        "platanus_allee consensus -o {params.prefix} -c {input.contigs} -IP1 {input.I500F} {input.I500R} -IP2 {input.I350F} {input.I350R} -t 14 2>log"

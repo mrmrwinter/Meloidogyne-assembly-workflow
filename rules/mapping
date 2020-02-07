@@ -1,0 +1,119 @@
+#####   MAPPING   #####
+
+configfile: "config.yaml"
+
+# rule all:
+#     input:
+#         expand("data/mapped/{sample}.{insert}.sam", sample=config["sample"], insert=config["insert"]),
+#         expand("data/mapped/{sample}.{insert}.sorted", sample=config["sample"], insert=config["insert"]),
+#         expand("data/mapped/{sample}.{insert}.sorted.bai", sample=config["sample"], insert=config["insert"])
+
+large="0014"
+
+rule index_preassembly:
+    conda:
+        "../envs/mapping.yaml"
+    input:
+        "data/spades/{sample}.{large}/scaffolds.fasta"
+    output:
+        "data/spades/{sample}.{large}/scaffolds.fasta.bwt"
+    params:
+        pfx="data/spades/{sample}.{large}/"
+    shell:
+        "bwa index \
+        {input} \
+        {params.pfx}"
+
+#rule bwa_mem:
+ #   conda:
+  #      "../envs/mapping.yaml"
+   # input:
+    #    contigs=expand("data/spades/{sample}.{large}/scaffolds.fasta", sample=config["sample"], large=config["large"]),
+     #   F="data/catted/{sample}.{insert}.1P.catted.fq.gz",
+      #  R="data/catted/{sample}.{insert}.2P.catted.fq.gz"
+   # output:
+    #    "data/mapped/{sample}.{insert}.sam"
+   # threads:
+    #    28
+   # shell:
+    #    "bwa mem \
+     #   -t {threads} \
+      #  {input.contigs} \
+       # {input.F} \
+      #  {input.R} \
+      #  > {output}"
+
+rule bwa_mem_paired:
+    conda:
+        "../envs/mapping.yaml"
+    input:
+        contigs=expand("data/spades/{sample}.{large}/scaffolds.fasta", sample=config["sample"], large=config["large"]),
+        F="data/trimmed/{sample}.{insert}.trimmed_1P.fq.gz",
+        R="data/trimmed/{sample}.{insert}.trimmed_2P.fq.gz"
+    output:
+        "data/mapped/{sample}.{insert}.sam"
+    threads:
+        28
+    shell:
+        "bwa mem \
+        -t {threads} \
+        {input.contigs} \
+        {input.F} \
+        {input.R} \
+        > {output}"
+
+#U=expand("data/trimmed/{sample}.{insert}.trimmed_{FR}U.fq.gz", sample=config["sample"], insert=config["insert"], FR=config["FR"])
+#shell:
+#	"bwa mem \
+   #     -t {threads} \
+  #      {input.contigs} \
+ #       {input.U} \
+#        >> {output}"
+
+rule sam2bam:
+    conda:
+        "../envs/mapping.yaml"
+    input:
+        sam="data/mapped/{sample}.{insert}.sam"
+    output:
+        "data/mapped/{sample}.{insert}.bam"
+    params:
+        "{sample}.{insert}.bam"
+    shell:
+        "samtools view \
+        -@ 14 \
+        -S \
+        -h \
+        -b \
+        -o tmp/{params} \
+        {input.sam} && \
+        mv tmp/{params} \
+        {output} && \
+        rm -rf tmp/"
+
+rule sort:
+    conda:
+        "../envs/mapping.yaml"
+    input:
+        "data/mapped/{sample}.{insert}.bam"
+    output:
+        "data/mapped/sorted/{sample}.{insert}.sorted"
+    threads:
+        28
+    shell:
+        "samtools sort \
+        -@ {threads} \
+	{input} \
+	-o {output}"
+
+rule samtools_index:
+    conda:
+        "../envs/mapping.yaml"
+    input:
+        "data/mapped/sorted/{sample}.{insert}.sorted"
+    output:
+        "data/mapped/sorted/{sample}.{insert}.sorted.bai"
+    shell:
+        "samtools index \
+        {input} \
+        {output}"

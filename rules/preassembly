@@ -1,0 +1,42 @@
+#####   PREASSEMBLY   #####
+
+configfile: "config.yaml"
+
+# rule all:
+#     input:
+        # expand("data/spades/{sample}.{large}/{spades_out}", sample=config["sample"], large=config["large"], spades_out=config["spades_out"])
+
+#rule cat_unpaired:
+ #   conda:
+  #      "../envs/preassembly.yaml"
+   # input:
+    #    F="data/trimmed/{sample}.{insert}.trimmed_1U.fq.gz",
+     #   R="data/trimmed/{sample}.{insert}.trimmed_2U.fq.gz"
+#    output:
+ #       "data/catted/{sample}.{insert}.U.catted.fq.gz"
+  #  threads:
+   #     28
+#    shell:
+ #       "cp {input.F} {output} && cat {input.R} >> {output}"
+
+rule spades:
+    conda:
+        "../envs/preassembly.yaml"
+    input:
+        F="data/raw/{sample}.{large}.R1.fastq.gz",
+        R="data/raw/{sample}.{large}.R2.fastq.gz",
+ #       U="data/catted/{sample}.{large}.U.catted.fq.gz"
+    output:
+        "data/spades/{sample}.{large}/scaffolds.fasta"
+    params:
+        outdir="data/spades/{sample}.{large}",
+        ram="500"
+    threads:
+        28
+    shell:
+        "spades.py \
+        -1 {input.F} \
+        -2 {input.R} \
+        -o {params.outdir} \
+        -t {threads} \
+        -m {params.ram}"

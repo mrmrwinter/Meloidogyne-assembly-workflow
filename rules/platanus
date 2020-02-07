@@ -1,0 +1,73 @@
+#####   PLATANUS   #####
+
+configfile: "config.yaml"
+
+plat_out= ["_contig.fa","_contigBubble.fa","_kmerFrq.tsv"]
+platscaff_out= ["_scaffold.fa","scaffoldBubble.fa"]
+
+rule all:
+    input:
+        expand("data/platanus/assemble/{sample}{plat_out}", sample=config["sample"], plat_out=plat_out),
+        expand("data/platanus/assemble/{sample}{platscaff_out}", sample=config["sample"], platscaff_out=platscaff_out),
+        expand("data/platanus/gapclosed/{sample}_gapClosed.fa", sample=config["sample"])
+
+rule platanus_assemble:
+    input:
+        lib1=expand("data/trimmed/{sample}.0014.trimmed_{FR}P.fastq", sample=config["sample"], FR=config["FR"]),
+        lib2=expand("data/trimmed/{sample}.0058.trimmed_{FR}P.fastq", sample=config["sample"], FR=config["FR"])
+    output:
+        "data/platanus/assemble/{sample}{plat_out}"
+    params:
+        out="data/platanus/assemble/{sample}"
+    threads:
+        28
+    shell:
+        "../../platanus assemble \
+        -o {params.out} \
+        -f {input.lib1} {input.lib2}\
+        -t {threads} \
+        -m 40 \
+        -tmp tmp/"
+
+
+
+rule platanus_scaffold:
+    input:
+        lib1=expand("data/trimmed/{sample}.0014.trimmed_{FR}P.fastq", sample=config["sample"], FR=config["FR"]),
+        lib2=expand("data/trimmed/{sample}.0058.trimmed_{FR}P.fastq", sample=config["sample"], FR=config["FR"]),
+        bubble="data/platanus/assemble/{sample}_contigBubble.fa",
+        contigs="data/platanus/assemble/{sample}_contig.fa"
+    output:
+        "data/platanus/scaffold/{sample}{platscaff_out}"
+    threads:
+        28
+    params:
+        pfx="data/platanus/scaffold/{sample}"
+    shell:
+        "../../platanus scaffold \
+        -t {threads} \
+        -b {input.bubble} \
+        -c {input.contigs} \
+        -o {params.pfx} \
+        -IP1  {input.lib1} \
+        -IP2  {input.lib2}"
+
+
+rule platanus_gapclose:
+    input:
+        scaffolds="data/platanus/scaffold/{sample}_scaffold.fa",
+        lib1=expand("data/trimmed/{sample}.0014.trimmed_{FR}P.fastq", sample=config["sample"], FR=config["FR"]),
+        lib2=expand("data/trimmed/{sample}.0058.trimmed_{FR}P.fastq", sample=config["sample"], FR=config["FR"])
+    output:
+        "data/platanus/gapclosed/{sample}_gapClosed.fa"
+    params:
+        pfx="data/platanus/gapclosed/{sample}"
+    threads:
+        28
+    shell:
+        "../../platanus gap_close \
+        -t {threads} \
+        -o {params.pfx} \
+        -c {input.scaffolds} \
+        -IP1 {input.lib1} \
+        -IP2 {input.lib2}"

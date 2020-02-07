@@ -1,0 +1,28 @@
+#####   BUSCO   #####
+
+configfile: "config.yaml"
+
+
+# rule all:
+# 	input:
+# 		expand("run_{sample}/short_summary_{sample}.txt", sample=SAMPLES)
+
+rule BUSCO:
+	input:
+		"data/redundans/{sample}/scaffolds.reduced.fa"
+	output:
+		"reports/BUSCO/run_{sample}/short_summary_{sample}.txt"
+	params:
+		pfx="{sample}",
+		db="/media/mike/mikesdrive/BUSCO/nematoda_odb9",
+		mode="genome"
+	shell:
+		"run_BUSCO.py \
+		-i {input} \
+		-o {params.pfx} \
+		-l {params.db} \
+		-m {params.mode} -f \
+		-c 14 \
+		&& mv \
+		run_{params.pfx}/ \
+		reports/BUSCO/"

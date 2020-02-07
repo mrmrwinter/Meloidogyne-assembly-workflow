@@ -1,0 +1,98 @@
+########     QUALITY CONTROL     ########
+
+###This rulefile controls read trimming and quality assessment of raw and trimmed reads.
+configfile: "config.yaml"
+
+# rule all:
+#     input:
+#         expand("reports/fastp/Mhap.0058.fastp.report", sample=config["sample"], insert=config["insert"]),
+#         expand("reports/fastqc/{sample}.{insert}.{R}_fastqc.html", sample=config["sample"], insert=config["insert"], R=config["R"]),
+#         expand("data/trimmed/{sample}.{insert}.trimmed_{trimbin}.fq.gz", sample=config["sample"], insert=config["insert"], trimbin=config["trimbin"]),
+#         expand("reports/trimmed_qc/{sample}.{insert}.trimmed_{trimbin}_fastqc.html", sample=config["sample"], insert=config["insert"], trimbin=config["trimbin"]),
+
+
+#fastp for QC and detection of insert sizes
+
+rule fastp:
+    conda:
+        "../envs/qc.yaml"
+    input:
+        R1="data/raw/{sample}.{insert}.R1.fastq.gz",
+        R2="data/raw/{sample}.{insert}.R2.fastq.gz"
+    output:
+        "reports/fastp/{sample}.{insert}"
+    threads:
+        28
+    params:
+        report="reports/fastp/Mhap.0058.fastp.report",
+        pfx="reports/fastp/{sample}.{insert}"
+    shell:
+        "fastp \
+        -w {threads} \
+        -i {input.R1} \
+        -I {input.R2} \
+        -j {params.pfx} \
+        -h {params.pfx} \
+        -V \
+        -R {params.report} \
+        -Q \
+        -G \
+        -A"
+
+rule fastqc:
+    conda:
+        "../envs/qc.yaml"
+    input:
+        "data/raw/{sample}.{insert}.{R}.fastq.gz"
+    output:
+        "reports/fastqc/{sample}.{insert}.{R}_fastqc.html"
+    threads:
+        28
+    params:
+        out="reports/fastqc"
+    shell:
+        "fastqc \
+        -o {params.out} \
+        -t {threads} \
+        {input}"
+
+rule trimmomatic:
+    conda:
+        "../envs/qc.yaml"
+    input:
+        R1="data/raw/{sample}.{insert}.R1.fastq.gz",
+        R2="data/raw/{sample}.{insert}.R2.fastq.gz"
+    output:
+        "data/trimmed/{sample}.{insert}.trimmed_{trimbin}.fq.gz"
+    threads:
+        28
+    params:
+        out="data/trimmed/{sample}.{insert}.trimmed.fq.gz"
+    shell:
+        "trimmomatic PE \
+        -version \
+        -threads {threads} \
+	{input.R1} {input.R2} \
+        -baseout {params.out} \
+        SLIDINGWINDOW:5:20 \
+        LEADING:5 \
+        TRAILING:10 \
+        MINLEN:30"
+
+
+rule trimmed_fastqc:
+    conda:
+        "../envs/qc.yaml"
+    input:
+        "data/trimmed/{sample}.{insert}.trimmed_{trimbin}.fq.gz"
+    output:
+        "reports/trimmed_qc/{sample}.{insert}.trimmed_{trimbin}_fastqc.html"
+    threads:
+        28
+    params:
+        out="reports/trimmed_qc"
+    shell:
+        "fastqc \
+        -o {params.out} \
+        -t {threads} \
+        {input}"

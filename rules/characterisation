@@ -1,0 +1,105 @@
+#####GENOME CHARACTERISATION #####
+
+configfile: "config.yaml"
+
+# rule all:
+#     input:
+#         expand("data/catted/{sample}.{insert}.{FR}P.catted.fq.gz", sample=config["sample"], insert=config["insert"], FR=config["FR"]),
+#         expand("reports/kmc/kmer_k21.hist"),
+#         expand("reports/genomescope/plot.png"),
+#         expand("reports/smudge/smudgeplot_smudgeplot.png")
+
+
+#concatenation of trimmed reads
+rule concatenation:
+    conda:
+        "../envs/characterisation.yaml"
+    input:
+        P="data/trimmed/{sample}.{insert}.trimmed_{FR}P.fq.gz",
+        U="data/trimmed/{sample}.{insert}.trimmed_{FR}U.fq.gz"
+    output:
+        "data/catted/{sample}.{insert}.{FR}P.catted.fq.gz"
+    threads:
+        28
+    shell:
+        "cp {input.P} {output} && cat {input.U} >> {output}"
+
+### KMC
+# counts kmers and coverage#uses all trimmed files of all libraries
+rule create_kmcfilelist:
+    conda:
+        "../envs/characterisation.yaml"
+    output:
+        "reports/kmc/kmcfilelist"
+#    shell:"ls data/raw | awk '{{print ""data/raw/""$0}}' - > {output}"
+    shell:"ls data/raw | sed -e 's/^/data\/raw\//' > {output}"
+
+
+rule kmc_count:
+    conda:
+        "../envs/characterisation.yaml"
+    input:
+        "reports/kmc/kmcfilelist"
+    output:
+        "reports/kmc/kmer_counts.kmc_pre"
+    threads:
+        28
+    params:kmc="reports/kmc/kmer_counts"
+    shell:
+        "rm -rf tmp/ && \
+	mkdir tmp/ && \
+	kmc \
+	-k21 \
+	-t{threads} \
+	-m500 \
+	-ci1 \
+	-cs10000 \
+	@{input} \
+	{params.kmc} \
+	tmp/"
+
+#kmer 21, 14 threads, 52G of memory, counting kmer coverages between 1 and 10000x"
+
+
+rule kmc_transform:
+    conda:
+        "../envs/characterisation.yaml"
+    input:
+        "reports/kmc/kmer_counts.kmc_suf",
+        "reports/kmc/kmer_counts.kmc_pre"
+    output:
+        "reports/kmc/kmer_k21.hist"
+    params:kmc="reports/kmc/kmer_counts"
+    shell:
+        "kmc_tools transform {params.kmc} histogram {output} -cx10000"
+
+#this rule replaces tabs with spaces to allow running from kmc3 into genomescope
+rule kmc2genomescope_transformation:
+    input:
+        "reports/kmc/kmer_k21.hist"
+    output:
+        "reports/kmc/kmer_k21.histo"
+    shell:
+        "expand -t 1 {input} > {output}"
+
+### GenomeScope
+#this is to see kmer spectra, estimate genome size, etc
+rule genomescope:
+    conda:"../envs/characterisation.yaml"
+    input:
+        "reports/kmc/kmer_k21.histo"
+    output:
+        "reports/genomescope/plot.log.png"
+    params:
+        outdir="reports/genomescope"
+    shell:
+        "Rscript scripts/genomescope.R {input} 21 150 {params.outdir} 1000 1"
+
+#smudgeplot for predicting ploidy
+rule smudgeplot:
+    input:
+        "reports/kmc/kmer_k21.hist"
+    output:
+        "reports/smudge/smudgeplot_smudgeplot.png"
+    script:
+        "scripts/smudge.sh"

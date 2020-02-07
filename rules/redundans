@@ -1,0 +1,29 @@
+#####   REDUNDANS   #####
+
+configfile: "config.yaml"
+
+rule all:
+    input:
+        expand("data/redundans/{sample}/scaffolds.reduced.fa", sample=config["sample"], insert=config["insert"])
+
+
+rule redundans:
+    conda:
+        "../envs/redundans.yaml"
+    input:
+        contigs=expand("data/spades/{sample}.{large}/scaffolds.fasta", sample=config["sample"], large=config["large"]),
+        reads=expand("data/clean/reads/{sample}.{insert}.R1.fq.gz", sample=config["sample"], insert=config["insert"])
+    output:
+        "data/redundans/{sample}/scaffolds.reduced.fa"
+    params:
+        out="data/redundans/{sample}/"
+    threads:
+        28
+    shell:
+        "./redundans/redundans.py \
+        -v \
+        -f {input.contigs} \
+        -i {input.reads} \
+        -o {params.out} \
+        -t {threads} \
+        -m 500"
