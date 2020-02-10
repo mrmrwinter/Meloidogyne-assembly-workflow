@@ -1,0 +1,21 @@
+#!/bin/bash
+#SBATCH -J platanus
+#SBATCH -n 1
+#SBATCH -o data/assemblies/platanus/assemble/Mhap_batch.out
+#SBATCH -e data/assemblies/platanus/assemble/Mhap_batch.err
+#SBATCH -p highmem
+#SBATCH --mem=500G
+#SBATCH --time=5-00:00:00
+
+module purge
+
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/531734/mike/libs
+
+../../platanus assemble \
+-t 28 \
+-m 400 \
+-o data/assemblies/platanus/assemble/Mhap \
+-f data/trimmed/Mhap.0014.trimmed_1P.fastq \
+data/trimmed/Mhap.0014.trimmed_2P.fastq \
+data/trimmed/Mhap.0058.trimmed_1P.fastq \
+data/trimmed/Mhap.0058.trimmed_2P.fastq

@@ -12,7 +12,7 @@ rule blobtools_create:
     conda:
         "../envs/blobtools.yaml"
     input:
-        contigs=expand("data/spades/{sample}.{large}/scaffolds.fasta.fake", sample=config["sample"], large=config["large"]),
+        contigs=expand("data/spades/{sample}.{large}/scaffolds.fasta", sample=config["sample"], large=config["large"]),
         mapping="data/mapped/sorted/{sample}.{insert}.sorted",
         hits="reports/blast/{sample}.blast.out"
     output:

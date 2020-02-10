@@ -1,0 +1,15 @@
+#!/bin/bash
+#SBATCH -J spadesbatch
+#SBATCH -n 1
+#SBATCH -o data/spades/Mhap.0014/batch.out
+#SBATCH -e data/spades/Mhap.0014/batch.err
+#SBATCH -p highmem
+#SBATCH --mem=500G
+#SBATCH --time=5-00:00:00
+
+module purge
+module load python/anaconda/4.6/miniconda/3.7
+
+source activate /home/531734/.conda/envs/pre-assembly
+
+spades.py -1 data/raw/Mhap.0014.R1.fastq.gz -2 data/raw/Mhap.0014.R2.fastq.gz -o data/spades/Mhap.0014/ -t 28 -m 500

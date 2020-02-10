@@ -1,0 +1,23 @@
+#!/bin/bash
+#SBATCH -J spades
+#SBATCH -n 1
+#SBATCH -o data/assemblies/spades/Mhap_batch.out
+#SBATCH -e data/assemblies/spades/Mhap_batch.err
+#SBATCH -p highmem
+#SBATCH --mem=500G
+#SBATCH --time=5-00:00:00
+
+module purge
+module load python/anaconda/4.6/miniconda/3.7
+
+source activate /home/531734/.conda/envs/pre-assembly
+
+spades.py \
+--pe1-1 data/trimmed/Mhap.0014.trimmed_1P.fq.gz \
+--pe1-2 data/trimmed/Mhap.0014.trimmed_2P.fq.gz \
+--pe2-1 data/trimmed/Mhap.0058.trimmed_1P.fq.gz \
+--pe2-2 data/trimmed/Mhap.0058.trimmed_2P.fq.gz \
+-o data/assemblies/spades/ \
+-t 28 \
+-m 500
+

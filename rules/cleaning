@@ -10,7 +10,7 @@ rule preassembly_index:
     conda:
         "../envs/cleaning.yaml"
     input:
-        expand("data/spades/{sample}.{large}/scaffolds.fasta.fake", sample=config["sample"], large=config["large"])
+        expand("data/spades/{sample}.{large}/scaffolds.fasta", sample=config["sample"], large=config["large"])
     output:
         "data/contaminants/index/{sample}.scaffolds.fai"
     shell:

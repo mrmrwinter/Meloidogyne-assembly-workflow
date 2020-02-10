@@ -24,7 +24,7 @@ rule fastp:
     threads:
         28
     params:
-        report="reports/fastp/Mhap.0058.fastp.report",
+        report="reports/fastp/{sample}.{insert}.fastp.report",
         pfx="reports/fastp/{sample}.{insert}"
     shell:
         "fastp \

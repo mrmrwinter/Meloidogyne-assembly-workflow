@@ -10,7 +10,7 @@ rule blast:
     conda:
         "../envs/blast.yaml"
     input:
-        expand("data/spades/{sample}.{large}/scaffolds.fasta.fake", sample=config["sample"], large=config["large"])
+        expand("data/spades/{sample}.{large}/scaffolds.fasta", sample=config["sample"], large=config["large"])
     output:
         "reports/blast/{sample}.blast.out"
     threads:

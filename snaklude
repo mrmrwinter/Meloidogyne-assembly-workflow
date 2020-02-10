@@ -9,55 +9,49 @@ include: "rules/blast"
 include: "rules/mapping"
 include: "rules/contam_detection"
 include: "rules/cleaning"
-#include: "rules/platanus
-#include: "rules/spades" 
+#include: "rules/platanus"
+#include: "rules/spades"
 #include: "rules/redundans"
 #include: "rules/busco"
 #include: "rules/quast"
 
 rule all:
     input:
-# QC
-#quality assessment and trimming
         expand("reports/fastp/{sample}.{insert}", sample=config["sample"], insert=config["insert"]),
         expand("reports/fastqc/{sample}.{insert}.{R}_fastqc.html", sample=config["sample"], insert=config["insert"], R=config["R"]),
         expand("data/trimmed/{sample}.{insert}.trimmed_{trimbin}.fq.gz", sample=config["sample"], insert=config["insert"], trimbin=config["trimbin"]),
         expand("reports/trimmed_qc/{sample}.{insert}.trimmed_{trimbin}_fastqc.html", sample=config["sample"], insert=config["insert"], trimbin=config["trimbin"]),
         expand("data/trimmed/{sample}.{insert}.trimmed_{trimbin}.fastq", sample=config["sample"], insert=config["insert"], trimbin=config["trimbin"]),
-
 # CHARACTERISATION
 #characterisation of kmer spectra, depth and ploidy
         expand("data/catted/{sample}.{insert}.{FR}P.catted.fq.gz", sample=config["sample"], insert=config["insert"], FR=config["FR"]),
         expand("reports/kmc/kmer_k21.hist"),
-        expand("reports/genomescope/plot.log.png"),
+#        expand("reports/genomescope/plot.log.png"),
 #        expand("reports/smudge/smudgeplot_smudgeplot.png"),
-
 # PREASSEMBLY
 #pre-assembly using SPAdes assembler
         expand("data/spades/{sample}.{large}/scaffolds.fasta", sample=config["sample"], large=config["large"]),
-
 # BLAST
 #blasting preassembled contigs for taxonomy
         expand("reports/blast/{sample}.blast.out", sample=config["sample"]),
-
 # MAPPING
 #mapping reads to preassembly
         expand("data/mapped/{sample}.{insert}.sam", sample=config["sample"], insert=config["insert"]),
         expand("data/mapped/sorted/{sample}.{insert}.sorted", sample=config["sample"], insert=config["insert"]),
         expand("data/mapped/sorted/{sample}.{insert}.sorted.bai", sample=config["sample"], insert=config["insert"]),
-        expand("data/spades/{sample}.{large}/scaffolds.fasta.bwt", sample=config["sample"], large=["large"],
+#        expand("data/spades/{sample}.{large}/scaffolds.fasta.bwt", sample=config["sample"], large=["large"]),
 #contamination detection
         expand("reports/blobtools/{sample}.{insert}/blobDB.json", sample=config["sample"], insert=config["insert"]),
         expand("reports/blobtools/{sample}.{insert}/blobDB.table.txt", sample=config["sample"], insert=config["insert"]),
         expand("reports/blobtools/{sample}.{insert}/blobDB.json.bestsum.phylum.p8.span.100.blobplot.bam0.png", sample=config["sample"], insert=config["insert"]),
 #cleaning
-	expand("reports/contaminants/{sample}.{insert}.scaff.contams.contigs", sample=config["sample"], insert=config["insert"]),
+        expand("reports/contaminants/{sample}.{insert}.scaff.contams.contigs", sample=config["sample"], insert=config["insert"]),
         expand("data/clean/reads/{sample}.{insert}.fq.gz", sample=config["sample"], insert=config["insert"]),
 #redundans assembly
-    #    expand("data/redundans/scaffolds.reduced.fa", sample=config["sample"], insert=config["insert"])
+    #    expand("data/redundans/scaffolds.reduced.fa", sample=config["sample"], insert=config["insert"]),
 #platanus assembly
 #	expand("data/platanus/assemble/{sample}{plat_out}", sample=config["sample"], plat_out=config["plat_out"]),
  #       expand("data/platanus/assemble/{sample}{platscaff_out}", sample=config["sample"], platscaff_out=config["platscaff_out"]),
   #      expand("data/platanus/gapclosed/{sample}_gapClosed.fa", sample=config["sample"]),
 #appraisal
-#	expand("reports/BUSCO/run_{sample}/short_summary_{sample}.txt", sample=config["sample"], sample=config["sample"]))
+#	expand("reports/BUSCO/run_{sample}/short_summary_{sample}.txt", sample=config["sample"], sample=config["sample"])
