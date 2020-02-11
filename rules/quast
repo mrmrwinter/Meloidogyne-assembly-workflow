@@ -1,0 +1,37 @@
+#####   QUAST   #####
+
+configfile: "config.yaml"
+
+assembler=["platanus/gapclosed","redundans/platanus","redundans/spades"]
+
+rule all:
+    input:
+        expand("", sample=config["sample"])
+
+rule quast_transformation: 
+
+rule quast:
+    conda;
+        "../envs/quast.yaml"
+    input:
+        "data/assemblies/{assembler}/{sample}/scaffolds.fasta"
+    output:
+        "reports/quast/{sample}/{sample_report.html"
+    threads:
+        28
+    params:
+        "reports/quast/{sample}/{sample}"
+    shell:
+        "quast.py \
+        -o {output} \
+        --features ... \
+        -t {threads} \
+        --labels ... \
+        -e \
+        -k \
+        -k-mer-size 33 \
+        -f \
+        --pe1 {input.reads1} \
+        --pe2 {input.reads2} \
+        
+        <contigfiles>"

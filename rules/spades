@@ -1,0 +1,33 @@
+#####   SPADES ASSEMBLY   #####
+
+configfile: "config.yaml"
+
+# rule all:
+#     input:
+#         expand("data/assemblies/spades/{sample}/scaffolds.fasta", sample=config["sample"])
+
+rule spades_assembly:
+    conda:
+        "../envs/preassembly.yaml"
+    input:
+        lib1_1=expand("data/trimmed/{sample}.{large}.trimmed_1P.fq.gz", sample=config["sample"], large=config["large"]),
+        lib1_2=expand("data/trimmed/{sample}.{large}.trimmed_2P.fq.gz", sample=config["sample"], large=config["large"]),
+        lib2_1=expand("data/trimmed/{sample}.{small}.trimmed_1P.fq.gz", sample=config["sample"], small=config["small"]),
+        lib2_2=expand("data/trimmed/{sample}.{small}.trimmed_2P.fq.gz", sample=config["sample"], small=config["small"]),
+        unpaired=expand("data/catted/{sample}.{large}.U.catted.fq.gz", sample=config["sample"], large=config["large"])
+    output:
+        "data/assemblies/spades/{sample}/scaffolds.fasta"
+    params:
+        out="data/assemblies/spades/{sample}/"
+    threads:
+        28
+    shell:
+        "spades.py \
+        --pe1-1 {input.lib1_1} \
+        --pe1-2 {input.lib1_2} \
+        --pe2-1 {input.lib2_1} \
+        --pe2-2 {input.lib2_2} \
+        -s {input.unpaired}\
+        -o {params.out} \
+        -t {threads} \
+        -m 500"

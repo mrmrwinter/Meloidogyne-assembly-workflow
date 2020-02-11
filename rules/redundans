@@ -2,28 +2,54 @@
 
 configfile: "config.yaml"
 
-rule all:
-    input:
-        expand("data/redundans/{sample}/scaffolds.reduced.fa", sample=config["sample"], insert=config["insert"])
+# rule all:
+#     input:
+#         expand("data/assemblies/redundans/{sample}/spades/scaffolds.filled.fa", sample=config["sample"]),
+#         expand("data/assemblies/redundans/{sample}/platanus/scaffolds.filled.fa", sample=config["sample"])
 
-
-rule redundans:
+rule redundans_spades:
     conda:
         "../envs/redundans.yaml"
     input:
-        contigs=expand("data/spades/{sample}.{large}/scaffolds.fasta", sample=config["sample"], large=config["large"]),
-        reads=expand("data/clean/reads/{sample}.{insert}.R1.fq.gz", sample=config["sample"], insert=config["insert"])
+        contigs=expand("data/assemblies/spades/{sample}/scaffolds.fasta", sample=config["sample"]),
+        lib1=expand("data/trimmed/{sample}.{large}.trimmed_{FR}P.fq.gz", sample=config["sample"], large=config["large"], FR=config["FR"]),
+        lib2=expand("data/trimmed/{sample}.{small}.trimmed_{FR}P.fq.gz", sample=config["sample"], small=config["small"], FR=config["FR"])
     output:
-        "data/redundans/{sample}/scaffolds.reduced.fa"
+        "data/assemblies/redundans/spades/{sample}/scaffolds.filled.fa"
     params:
-        out="data/redundans/{sample}/"
+        out="data/assemblies/redundans/spades/{sample}/"
     threads:
         28
     shell:
-        "./redundans/redundans.py \
+        "rm -rf {params.out} && \
+        ./redundans/redundans.py \
         -v \
         -f {input.contigs} \
-        -i {input.reads} \
+        -i {input.lib1} {input.lib2}\
+        -o {params.out} \
+        -t {threads} \
+        -m 500"
+
+
+rule redundans_platanus:
+    conda:
+        "../envs/redundans.yaml"
+    input:
+        contigs="data/assemblies/platanus/assemble/{sample}_contig.fa",
+        lib1=expand("data/trimmed/{sample}.{large}.trimmed_{FR}P.fq.gz", sample=config["sample"], large=config["large"], FR=config["FR"]),
+        lib2=expand("data/trimmed/{sample}.{small}.trimmed_{FR}P.fq.gz", sample=config["sample"], small=config["small"], FR=config["FR"])
+    output:
+        "data/assemblies/redundans/platanus/{sample}/scaffolds.filled.fa"
+    params:
+        out="data/assemblies/redundans/platanus/{sample}/"
+    threads:
+        28
+    shell:
+        "rm -rf {params.out} && \
+        ./redundans/redundans.py \
+        -v \
+        -f {input.contigs} \
+        -i {input.lib1} {input.lib2}\
         -o {params.out} \
         -t {threads} \
         -m 500"

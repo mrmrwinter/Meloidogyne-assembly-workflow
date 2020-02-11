@@ -2,19 +2,61 @@
 
 configfile: "config.yaml"
 
-
 # rule all:
 # 	input:
-# 		expand("run_{sample}/short_summary_{sample}.txt", sample=SAMPLES)
+ 		# expand("reports/BUSCO/{sample}/run_redundans_platanus/short_summary_{sample}.txt", sample=config["sample"]),
+		# expand("reports/BUSCO/{sample}/run_redundans_spades/short_summary_{sample}.txt", sample=config["sample"]),
+		# expand("reports/BUSCO/{sample}/run_platanus_gapclosed/short_summary_{sample}.txt", sample=config["sample"])
 
-rule BUSCO:
+
+rule BUSCOing_redundans_platanus:
 	input:
-		"data/redundans/{sample}/scaffolds.reduced.fa"
+		"data/assemblies/redundans/{sample}/platanus/scaffolds.filled.fa"
 	output:
-		"reports/BUSCO/run_{sample}/short_summary_{sample}.txt"
+		"reports/BUSCO/{sample}/run_redundans_platanus/short_summary_{sample}.txt"
 	params:
-		pfx="{sample}",
-		db="/media/mike/mikesdrive/BUSCO/nematoda_odb9",
+		pfx="redundans_platanus",
+		db="BUSCO_db/nematoda_odb9",
+		mode="genome"
+	shell:
+		"run_BUSCO.py \
+		-i {input} \
+		-o {params.pfx} \
+		-l {params.db} \
+		-m {params.mode} -f \
+		-c 14 \
+		&& mv \
+		run_{params.pfx}/ \
+		reports/BUSCO/"
+
+rule BUSCOing_redundans_spades:
+	input:
+		"data/assemblies/redundans/{sample}/spades/scaffolds.filled.fa"
+	output:
+		"reports/BUSCO/{sample}/run_redundans_spades/short_summary_{sample}.txt"
+	params:
+		pfx="redundans_spades",
+		db="BUSCO_db/nematoda_odb9",
+		mode="genome"
+	shell:
+		"run_BUSCO.py \
+		-i {input} \
+		-o {params.pfx} \
+		-l {params.db} \
+		-m {params.mode} -f \
+		-c 14 \
+		&& mv \
+		run_{params.pfx}/ \
+		reports/BUSCO/"
+
+rule BUSCOing_platanus_gapclosed:
+	input:
+		"data/assemblies/platanus/gapclosed/{sample}_gapclosed.fa"
+	output:
+		"reports/BUSCO/{sample}/run_platanus_gapclosed/short_summary_{sample}.txt"
+	params:
+		pfx="platanus_gapclosed",
+		db="BUSCO_db/nematoda_odb9",
 		mode="genome"
 	shell:
 		"run_BUSCO.py \

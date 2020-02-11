@@ -65,6 +65,7 @@ bwa_ind: [".amb", ".ann", ".bwt", ".pac", ".sa"]
 trimbin: ["1P", "2P", "1U", "2U"]
 
 #for platanus
-plat_out: ["_contig.fa","_contigBubble.fa","_kmerFrq.tsv"]
+plat_out: ["_contig.fa","_contigBubble.fa"]
+
 platscaff_out: ["_scaffold.fa","scaffoldBubble.fa"]
 

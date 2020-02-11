@@ -8,8 +8,6 @@ configfile: "config.yaml"
 #         expand("data/mapped/{sample}.{insert}.sorted", sample=config["sample"], insert=config["insert"]),
 #         expand("data/mapped/{sample}.{insert}.sorted.bai", sample=config["sample"], insert=config["insert"])
 
-large="0014"
-
 rule index_preassembly:
     conda:
         "../envs/mapping.yaml"
@@ -75,13 +73,15 @@ rule sam2bam:
     conda:
         "../envs/mapping.yaml"
     input:
-        sam="data/mapped/{sample}.{insert}.sam"
+        sam="data/mapped/{sample}.{insert}.sam",
     output:
         "data/mapped/{sample}.{insert}.bam"
     params:
         "{sample}.{insert}.bam"
     shell:
-        "samtools view \
+        "rm -rf tmp/ && \
+        mkdir tmp/ && \
+        samtools view \
         -@ 14 \
         -S \
         -h \
@@ -104,8 +104,8 @@ rule sort:
     shell:
         "samtools sort \
         -@ {threads} \
-	{input} \
-	-o {output}"
+        {input} \
+        -o {output}"
 
 rule samtools_index:
     conda:

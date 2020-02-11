@@ -9,10 +9,10 @@ include: "rules/blast"
 include: "rules/mapping"
 include: "rules/contam_detection"
 include: "rules/cleaning"
-#include: "rules/platanus"
-#include: "rules/spades"
-#include: "rules/redundans"
-#include: "rules/busco"
+include: "rules/platanus"
+include: "rules/spades"
+include: "rules/redundans"
+include: "rules/busco"
 #include: "rules/quast"
 
 rule all:
@@ -47,11 +47,16 @@ rule all:
 #cleaning
         expand("reports/contaminants/{sample}.{insert}.scaff.contams.contigs", sample=config["sample"], insert=config["insert"]),
         expand("data/clean/reads/{sample}.{insert}.fq.gz", sample=config["sample"], insert=config["insert"]),
-#redundans assembly
-    #    expand("data/redundans/scaffolds.reduced.fa", sample=config["sample"], insert=config["insert"]),
 #platanus assembly
-#	expand("data/platanus/assemble/{sample}{plat_out}", sample=config["sample"], plat_out=config["plat_out"]),
- #       expand("data/platanus/assemble/{sample}{platscaff_out}", sample=config["sample"], platscaff_out=config["platscaff_out"]),
-  #      expand("data/platanus/gapclosed/{sample}_gapClosed.fa", sample=config["sample"]),
-#appraisal
-#	expand("reports/BUSCO/run_{sample}/short_summary_{sample}.txt", sample=config["sample"], sample=config["sample"])
+        expand("data/assemblies/platanus/assemble/{sample}{plat_out}", sample=config["sample"], plat_out=config["plat_out"]),
+        expand("data/assemblies/platanus/scaffold/{sample}_scaffold.fa", sample=config["sample"]),
+        expand("data/assemblies/platanus/gapclosed/{sample}_gapClosed.fa", sample=config["sample"]),
+#spades assembly
+        expand("data/assemblies/spades/{sample}/scaffolds.fasta", sample=config["sample"]),
+#redundans assembly
+        expand("data/assemblies/redundans/{sample}/spades/scaffolds.filled.fa", sample=config["sample"]),
+        expand("data/assemblies/redundans/{sample}/platanus/scaffolds.filled.fa", sample=config["sample"]),
+# busco appraisal
+        expand("reports/BUSCO/{sample}/run_redundans_platanus/short_summary_{sample}.txt", sample=config["sample"]),
+        expand("reports/BUSCO/{sample}/run_redundans_spades/short_summary_{sample}.txt", sample=config["sample"]),
+        expand("reports/BUSCO/{sample}/run_platanus_gapclosed/short_summary_{sample}.txt", sample=config["sample"])
