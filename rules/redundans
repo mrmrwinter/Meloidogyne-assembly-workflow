@@ -15,7 +15,7 @@ rule redundans_spades:
         lib1=expand("data/trimmed/{sample}.{large}.trimmed_{FR}P.fq.gz", sample=config["sample"], large=config["large"], FR=config["FR"]),
         lib2=expand("data/trimmed/{sample}.{small}.trimmed_{FR}P.fq.gz", sample=config["sample"], small=config["small"], FR=config["FR"])
     output:
-        "data/assemblies/redundans/spades/{sample}/scaffolds.filled.fa"
+        "data/assemblies/redundans/{sample}/spades/scaffolds.filled.fa"
     params:
         out="data/assemblies/redundans/spades/{sample}/"
     threads:
@@ -39,7 +39,7 @@ rule redundans_platanus:
         lib1=expand("data/trimmed/{sample}.{large}.trimmed_{FR}P.fq.gz", sample=config["sample"], large=config["large"], FR=config["FR"]),
         lib2=expand("data/trimmed/{sample}.{small}.trimmed_{FR}P.fq.gz", sample=config["sample"], small=config["small"], FR=config["FR"])
     output:
-        "data/assemblies/redundans/platanus/{sample}/scaffolds.filled.fa"
+        "data/assemblies/redundans/{sample}/platanus/scaffolds.filled.fa"
     params:
         out="data/assemblies/redundans/platanus/{sample}/"
     threads:

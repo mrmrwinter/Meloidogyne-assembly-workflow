@@ -57,8 +57,8 @@ rule platanus_scaffold:
 rule platanus_gapclose:
     input:
         scaffolds="data/assemblies/platanus/scaffold/{sample}_scaffold.fa",
-        lib1=expand("data/trimmed/{sample}.0014.trimmed_{FR}P.fastq", sample=config["sample"], FR=config["FR"]),
-        lib2=expand("data/trimmed/{sample}.0058.trimmed_{FR}P.fastq", sample=config["sample"], FR=config["FR"])
+        lib1=expand("data/trimmed/{sample}.{large}.trimmed_{FR}P.fastq", sample=config["sample"], large=config["large"], FR=config["FR"]),
+        lib2=expand("data/trimmed/{sample}.{small}.trimmed_{FR}P.fastq", sample=config["sample"], small=config["small"], FR=config["FR"])
     output:
         "data/assemblies/platanus/gapclosed/{sample}_gapClosed.fa"
     params:

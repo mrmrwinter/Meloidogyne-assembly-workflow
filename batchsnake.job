@@ -11,9 +11,9 @@
 echo $SLURM_JOB_NODELIST
  
 module purge
-module load python/anaconda/4.6/miniconda/3.7
+#module load python/anaconda/4.6/miniconda/3.7
  
-source activate /home/531734/mike/.conda/envs/snakemake
+source activate /home/531734/.conda/envs/snakemake
  
 cd /home/531734/mike/Meloidogyne-assembly-workflow/
 

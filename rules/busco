@@ -51,7 +51,7 @@ rule BUSCOing_redundans_spades:
 
 rule BUSCOing_platanus_gapclosed:
 	input:
-		"data/assemblies/platanus/gapclosed/{sample}_gapclosed.fa"
+		"data/assemblies/platanus/gapclosed/{sample}_gapClosed.fa"
 	output:
 		"reports/BUSCO/{sample}/run_platanus_gapclosed/short_summary_{sample}.txt"
 	params:

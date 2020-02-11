@@ -6,6 +6,16 @@ configfile: "config.yaml"
 #     input:
 #         expand("data/assemblies/spades/{sample}/scaffolds.fasta", sample=config["sample"])
 
+rule catting_unpaired:
+    input:
+        U1="data/trimmed/{sample}.{insert}.trimmed_1U.fq.gz",
+        U2="data/trimmed/{sample}.{insert}.trimmed_2U.fq.gz",
+    output:
+        "data/catted/{sample}.{insert}.U.catted.fq.gz"
+    shell:
+        "cat {input.U1} > {output} && \
+        cat {input.U2} >> {output}"
+
 rule spades_assembly:
     conda:
         "../envs/preassembly.yaml"
