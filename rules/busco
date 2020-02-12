@@ -10,6 +10,8 @@ configfile: "config.yaml"
 
 
 rule BUSCOing_redundans_platanus:
+        conda:
+                "../envs/BUSCO.yaml"
 	input:
 		"data/assemblies/redundans/{sample}/platanus/scaffolds.filled.fa"
 	output:
@@ -30,6 +32,8 @@ rule BUSCOing_redundans_platanus:
 		reports/BUSCO/"
 
 rule BUSCOing_redundans_spades:
+       	conda:
+       	       	"../envs/BUSCO.yaml"
 	input:
 		"data/assemblies/redundans/{sample}/spades/scaffolds.filled.fa"
 	output:
@@ -50,6 +54,8 @@ rule BUSCOing_redundans_spades:
 		reports/BUSCO/"
 
 rule BUSCOing_platanus_gapclosed:
+       	conda:
+       	       	"../envs/BUSCO.yaml"
 	input:
 		"data/assemblies/platanus/gapclosed/{sample}_gapClosed.fa"
 	output:

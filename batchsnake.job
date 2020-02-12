@@ -1,11 +1,11 @@
 #!/bin/bash
-#SBATCH -J BIIGdata      
+#SBATCH -J BiGdata      
 #SBATCH -N 1
 #SBATCH --ntasks-per-node 28
 #SBATCH -D /home/531734/mike/Meloidogyne-assembly-workflow
 #SBATCH -o %N.%j.%a.out
 #SBATCH -e %N.%j.%a.err
-#SBATCH -p compute
+#SBATCH -p highmem
 #SBATCH --exclusive
  
 echo $SLURM_JOB_NODELIST
@@ -13,8 +13,10 @@ echo $SLURM_JOB_NODELIST
 module purge
 #module load python/anaconda/4.6/miniconda/3.7
  
+
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/531734/mike/libs
 source activate /home/531734/.conda/envs/snakemake
  
 cd /home/531734/mike/Meloidogyne-assembly-workflow/
 
-snakemake -s snaklude --configfile configW1.yaml -k --printshellcmds --use-conda --cores all 
+snakemake -s snaklude --configfile configW1.yaml -k --printshellcmds --use-conda --cores all --forcerun
