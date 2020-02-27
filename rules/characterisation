@@ -41,22 +41,24 @@ rule kmc_count:
     input:
         "reports/kmc/kmcfilelist"
     output:
-        "reports/kmc/kmer_counts.kmc_pre"
+        pre = "reports/kmc/kmer_counts.kmc_pre",
+        suf = "reports/kmc/kmer_counts.kmc_suf"
     threads:
         28
-    params:kmc="reports/kmc/kmer_counts"
+    params:
+        kmc = "reports/kmc/kmer_counts"
     shell:
         "rm -rf tmp/ && \
-	mkdir tmp/ && \
-	kmc \
-	-k21 \
-	-t{threads} \
-	-m500 \
-	-ci1 \
-	-cs10000 \
-	@{input} \
-	{params.kmc} \
-	tmp/"
+        mkdir tmp/ && \
+        kmc \
+        -k21 \
+        -t {threads} \
+        -m500 \
+        -ci1 \
+        -cs10000 \
+        @{input} \
+        {params.kmc} \
+        tmp/"
 
 #kmer 21, 14 threads, 52G of memory, counting kmer coverages between 1 and 10000x"
 
@@ -65,11 +67,12 @@ rule kmc_transform:
     conda:
         "../envs/characterisation.yaml"
     input:
-        "reports/kmc/kmer_counts.kmc_suf",
-        "reports/kmc/kmer_counts.kmc_pre"
+        suf = "reports/kmc/kmer_counts.kmc_suf",
+        pre = "reports/kmc/kmer_counts.kmc_pre"
     output:
         "reports/kmc/kmer_k21.hist"
-    params:kmc="reports/kmc/kmer_counts"
+    params:
+        kmc="reports/kmc/kmer_counts"
     shell:
         "kmc_tools transform {params.kmc} histogram {output} -cx10000"
 
@@ -85,7 +88,8 @@ rule kmc2genomescope_transformation:
 ### GenomeScope
 #this is to see kmer spectra, estimate genome size, etc
 rule genomescope:
-    conda:"../envs/characterisation.yaml"
+    conda:
+        "../envs/characterisation.yaml"
     input:
         "reports/kmc/kmer_k21.histo"
     output:

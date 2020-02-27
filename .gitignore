@@ -7,7 +7,6 @@ batchsnake
 blobtools
 c095.2294928.4294967294.err
 c095.2294928.4294967294.out
-data/raw/*
 feB5qb
 redundans
 report.html
@@ -20,3 +19,4 @@ tmp
 u2BP4l
 ydxfSY
 BUSCO_db/*
+data/*
