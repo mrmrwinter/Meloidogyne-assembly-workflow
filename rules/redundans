@@ -22,7 +22,7 @@ rule redundans_spades:
         28
     shell:
         "rm -rf {params.out} && \
-        ./redundans/redundans.py \
+        ../redundans/redundans.py \
         -v \
         -f {input.contigs} \
         -i {input.lib1} {input.lib2}\
