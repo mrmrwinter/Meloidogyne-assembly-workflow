@@ -58,6 +58,7 @@ rule all:
 #redundans assembly
         expand("data/assemblies/redundans/{sample}/spades/scaffolds.filled.fa", sample=config["sample"]),
         expand("data/assemblies/redundans/{sample}/platanus/scaffolds.filled.fa", sample=config["sample"]),
+        expand("data/assemblies/redundans/{sample}/platanusgc/scaffolds.filled.fa", sample=config["sample"]),
 # busco appraisal
         expand("reports/BUSCO/{sample}/run_redundans_platanus/short_summary_{sample}.txt", sample=config["sample"]),
         expand("reports/BUSCO/{sample}/run_redundans_spades/short_summary_{sample}.txt", sample=config["sample"]),

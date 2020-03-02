@@ -71,5 +71,4 @@ rule platanus_gapclose:
         -o {params.pfx} \
         -c {input.scaffolds} \
         -IP1 {input.lib1} \
-        -IP2 {input.lib2} \
-        -m 400"
+        -IP2 {input.lib2}"

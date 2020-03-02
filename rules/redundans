@@ -17,7 +17,7 @@ rule redundans_spades:
     output:
         "data/assemblies/redundans/{sample}/spades/scaffolds.filled.fa"
     params:
-        out="data/assemblies/redundans/spades/{sample}/"
+        out="data/assemblies/redundans/{sample}/spades/"
     threads:
         28
     shell:
@@ -28,10 +28,10 @@ rule redundans_spades:
         -i {input.lib1} {input.lib2}\
         -o {params.out} \
         -t {threads} \
-        -m 500"
+        -m 50"
 
 
-rule redundans_platanus:
+rule redundans_platanus_assemble:
     conda:
         "../envs/redundans.yaml"
     input:
@@ -41,15 +41,39 @@ rule redundans_platanus:
     output:
         "data/assemblies/redundans/{sample}/platanus/scaffolds.filled.fa"
     params:
-        out="data/assemblies/redundans/platanus/{sample}/"
+        out="data/assemblies/redundans/{sample}/platanus/"
     threads:
         28
     shell:
         "rm -rf {params.out} && \
-        ./redundans/redundans.py \
+        ../redundans/redundans.py \
         -v \
         -f {input.contigs} \
         -i {input.lib1} {input.lib2}\
         -o {params.out} \
         -t {threads} \
-        -m 500"
+        -m 50"
+
+
+rule redundans_platanus_gapclosed:
+    conda:
+        "../envs/redundans.yaml"
+    input:
+        contigs="data/assemblies/platanus/gapclosed/{sample}_gapClosed.fa",
+        lib1=expand("data/trimmed/{sample}.{large}.trimmed_{FR}P.fq.gz", sample=config["sample"], large=config["large"], FR=config["FR"]),
+        lib2=expand("data/trimmed/{sample}.{small}.trimmed_{FR}P.fq.gz", sample=config["sample"], small=config["small"], FR=config["FR"])
+    output:
+        "data/assemblies/redundans/{sample}/platanusgc/scaffolds.filled.fa"
+    params:
+        out="data/assemblies/redundans/{sample}/platanusgc/"
+    threads:
+        28
+    shell:
+        "rm -rf {params.out} && \
+        ../redundans/redundans.py \
+        -v \
+        -f {input.contigs} \
+        -i {input.lib1} {input.lib2}\
+        -o {params.out} \
+        -t {threads} \
+        -m 50"

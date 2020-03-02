@@ -16,7 +16,7 @@ rule blast:
     threads:
         28
     params:
-        blastdb="/home/531734/mike/blastdb_nt/nt"
+        blastdb="nt"
     shell:
         "blastn \
         -db {params.blastdb} \
