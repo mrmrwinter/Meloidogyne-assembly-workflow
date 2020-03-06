@@ -77,9 +77,9 @@ rule kmc_transform:
 #this rule replaces tabs with spaces to allow running from kmc3 into genomescope
 rule kmc2genomescope_transformation:
     input:
-        "reports/kmc/kmer_k21.hist"
+        "reports/kmc/{sample}/kmer_k21.hist"
     output:
-        "reports/kmc/kmer_k21.histo"
+        "reports/kmc/{sample}/kmer_k21.histo"
     shell:
         "expand -t 1 {input} > {output}"
 
@@ -89,9 +89,9 @@ rule genomescope:
     conda:
         "../envs/characterisation.yaml"
     input:
-        "reports/kmc/kmer_k21.histo"
+        "reports/kmc/{sample}/kmer_k21.histo"
     output:
-        "reports/genomescope/plot.log.png"
+        "reports/genomescope/{sample}/plot.log.png"
     params:
         outdir="reports/genomescope"
     shell:
@@ -100,8 +100,8 @@ rule genomescope:
 #smudgeplot for predicting ploidy
 rule smudgeplot:
     input:
-        "reports/kmc/kmer_k21.hist"
+        "reports/kmc/{sample}/kmer_k21.hist"
     output:
-        "reports/smudge/smudgeplot_smudgeplot.png"
+        "reports/smudge/{sample}/smudgeplot_smudgeplot.png"
     script:
         "scripts/smudge.sh"

@@ -12,7 +12,7 @@ include: "rules/cleaning"
 include: "rules/platanus"
 include: "rules/spades"
 include: "rules/redundans"
-include: "rules/busco"
+include: "rules/appraisal"
 #include: "rules/quast"
 
 
@@ -27,9 +27,9 @@ rule all:
 # CHARACTERISATION
 #characterisation of kmer spectra, depth and ploidy
         expand("data/catted/{sample}.{insert}.{FR}P.catted.fq.gz", sample=config["sample"], insert=config["insert"], FR=config["FR"]),
-        expand("reports/kmc/kmer_k21.hist"),
-#        expand("reports/genomescope/plot.log.png"),
-#        expand("reports/smudge/smudgeplot_smudgeplot.png"),
+        expand("reports/kmc/{sample}/kmer_k21.hist"),
+        expand("reports/genomescope/{sample}/plot.log.png"),
+#        expand("reports/smudge/{sample}/smudgeplot_smudgeplot.png"),
 # PREASSEMBLY
 #pre-assembly using SPAdes assembler
         expand("data/spades/{sample}.{large}/scaffolds.fasta", sample=config["sample"], large=config["large"]),
@@ -60,6 +60,11 @@ rule all:
         expand("data/assemblies/redundans/{sample}/platanus/scaffolds.filled.fa", sample=config["sample"]),
         expand("data/assemblies/redundans/{sample}/platanusgc/scaffolds.filled.fa", sample=config["sample"]),
 # busco appraisal
-        expand("reports/BUSCO/{sample}/run_redundans_platanus/short_summary_{sample}.txt", sample=config["sample"]),
-        expand("reports/BUSCO/{sample}/run_redundans_spades/short_summary_{sample}.txt", sample=config["sample"]),
-        expand("reports/BUSCO/{sample}/run_platanus_gapclosed/short_summary_{sample}.txt", sample=config["sample"])
+        expand("reports/BUSCO/{sample}/redundans_platanus/short_summary_{sample}.txt", sample=config["sample"]),
+        expand("reports/BUSCO/{sample}/redundans_platanusgc/short_summary_{sample}.txt", sample=config["sample"]),
+        expand("reports/BUSCO/{sample}/redundans_spades/short_summary_{sample}.txt", sample=config["sample"]),
+        expand("reports/BUSCO/{sample}/platanus_gapclosed/short_summary_{sample}.txt", sample=config["sample"]),
+        expand("reports/BUSCO/{sample}/spades/short_summary_{sample}.txt", sample=config["sample"]),
+        expand("reports/BUSCO/{sample}/platanus_ass/short_summary_{sample}.txt", sample=config["sample"]),
+# quast appraisal
+        expand("reports/quast/{sample}/report.tsv", sample=config["sample"])
