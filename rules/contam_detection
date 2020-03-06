@@ -22,7 +22,7 @@ rule blobtools_create:
     threads:
         28
     shell:
-        "./blobtools/blobtools create \
+        "../blobtools/blobtools create \
         -i {input.contigs} \
         -b {input.mapping} \
         -t {input.hits} \
@@ -40,7 +40,7 @@ rule blobtools_view:
     threads:
         28
     shell:
-        "./blobtools/blobtools view \
+        "../blobtools/blobtools view \
         -i {input} \
         --out {params.out}"
 
@@ -56,6 +56,6 @@ rule blobtools_plot:
     threads:
         28
     shell:
-        "./blobtools/blobtools plot \
+        "../blobtools/blobtools plot \
         -i {input} \
         --out {params.out}"

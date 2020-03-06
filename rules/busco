@@ -18,17 +18,17 @@ rule BUSCOing_redundans_platanus:
 		"reports/BUSCO/{sample}/run_redundans_platanus/short_summary_{sample}.txt"
 	params:
 		pfx="redundans_platanus",
-		db="BUSCO_db/nematoda_odb9",
+		db="../BUSCO/nematoda_odb10",
 		mode="genome"
 	shell:
-		"run_BUSCO.py \
+		"busco \
 		-i {input} \
 		-o {params.pfx} \
 		-l {params.db} \
 		-m {params.mode} -f \
 		-c 14 \
 		&& mv \
-		run_{params.pfx}/ \
+		{params.pfx}/ \
 		reports/BUSCO/"
 
 rule BUSCOing_redundans_spades:
@@ -40,17 +40,17 @@ rule BUSCOing_redundans_spades:
 		"reports/BUSCO/{sample}/run_redundans_spades/short_summary_{sample}.txt"
 	params:
 		pfx="redundans_spades",
-		db="BUSCO_db/nematoda_odb9",
+		db="../BUSCO/nematoda_odb10",
 		mode="genome"
 	shell:
-		"run_BUSCO.py \
+		"busco \
 		-i {input} \
 		-o {params.pfx} \
 		-l {params.db} \
 		-m {params.mode} -f \
 		-c 14 \
 		&& mv \
-		run_{params.pfx}/ \
+		{params.pfx}/ \
 		reports/BUSCO/"
 
 rule BUSCOing_platanus_gapclosed:
@@ -62,15 +62,30 @@ rule BUSCOing_platanus_gapclosed:
 		"reports/BUSCO/{sample}/run_platanus_gapclosed/short_summary_{sample}.txt"
 	params:
 		pfx="platanus_gapclosed",
-		db="BUSCO_db/nematoda_odb9",
+		db="../BUSCO/nematoda_odb10",
 		mode="genome"
 	shell:
-		"run_BUSCO.py \
+		"busco \
 		-i {input} \
 		-o {params.pfx} \
 		-l {params.db} \
 		-m {params.mode} -f \
 		-c 14 \
 		&& mv \
-		run_{params.pfx}/ \
+		{params.pfx}/ \
 		reports/BUSCO/"
+
+rule quast:
+    conda:
+        "../envs/quast.yaml"
+    input:
+        plat_ass = "data/assemblies/platanus/assemble/{sample}{plat_out}",
+        plat_gc = "data/assemblies/platanus/gapclosed/{sample}_gapClosed.fa",
+        spades = "data/assemblies/spades/{sample}/scaffolds.fasta",
+        platass_redun = "data/assemblies/redundans/{sample}/platanus/scaffolds.filled.fa",
+        platgc_redun = "data/assemblies/redundans/{sample}/platanusgc/scaffolds.filled.fa",
+        spades_redun = "data/assemblies/redundans/{sample}/spades/scaffolds.filled.fa"
+    output:
+        ""
+    shell:
+        "quast "

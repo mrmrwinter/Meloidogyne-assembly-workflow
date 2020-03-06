@@ -52,15 +52,13 @@ rule kmc_count:
         mkdir tmp/ && \
         kmc \
         -k21 \
-        -t {threads} \
-        -m500 \
+        -t{threads} \
+        -m50 \
         -ci1 \
         -cs10000 \
         @{input} \
         {params.kmc} \
         tmp/"
-
-#kmer 21, 14 threads, 52G of memory, counting kmer coverages between 1 and 10000x"
 
 
 rule kmc_transform:
