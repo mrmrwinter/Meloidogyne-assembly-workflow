@@ -2,16 +2,16 @@
 
 configfile: "config.yaml"
 
-include: "rules/qc"
-include: "rules/characterisation"
-include: "rules/preassembly"
-include: "rules/blast"
-include: "rules/mapping"
-include: "rules/contam_detection"
-include: "rules/cleaning"
-include: "rules/platanus"
-include: "rules/spades"
-include: "rules/redundans"
+include: "rules/qc",
+include: "rules/characterisation",
+include: "rules/preassembly",
+include: "rules/blast",
+include: "rules/mapping",
+include: "rules/contam_detection",
+include: "rules/cleaning",
+include: "rules/platanus",
+include: "rules/spades",
+include: "rules/redundans",
 include: "rules/appraisal"
 #include: "rules/quast"
 
@@ -27,9 +27,9 @@ rule all:
 # CHARACTERISATION
 #characterisation of kmer spectra, depth and ploidy
         expand("data/catted/{sample}.{insert}.{FR}P.catted.fq.gz", sample=config["sample"], insert=config["insert"], FR=config["FR"]),
-        expand("reports/kmc/{sample}/kmer_k21.hist"),
-        expand("reports/genomescope/{sample}/plot.log.png"),
-#        expand("reports/smudge/{sample}/smudgeplot_smudgeplot.png"),
+        expand("reports/kmc/{sample}/kmer_k21.hist", sample=config["sample"]),
+        expand("reports/genomescope/{sample}/plot.log.png", sample=config["sample"]),
+        expand("reports/smudge/{sample}/smudgeplot_smudgeplot.png", sample=config["sample"]),
 # PREASSEMBLY
 #pre-assembly using SPAdes assembler
         expand("data/spades/{sample}.{large}/scaffolds.fasta", sample=config["sample"], large=config["large"]),
@@ -60,11 +60,11 @@ rule all:
         expand("data/assemblies/redundans/{sample}/platanus/scaffolds.filled.fa", sample=config["sample"]),
         expand("data/assemblies/redundans/{sample}/platanusgc/scaffolds.filled.fa", sample=config["sample"]),
 # busco appraisal
-        expand("reports/BUSCO/{sample}/redundans_platanus/short_summary_{sample}.txt", sample=config["sample"]),
-        expand("reports/BUSCO/{sample}/redundans_platanusgc/short_summary_{sample}.txt", sample=config["sample"]),
-        expand("reports/BUSCO/{sample}/redundans_spades/short_summary_{sample}.txt", sample=config["sample"]),
-        expand("reports/BUSCO/{sample}/platanus_gapclosed/short_summary_{sample}.txt", sample=config["sample"]),
-        expand("reports/BUSCO/{sample}/spades/short_summary_{sample}.txt", sample=config["sample"]),
-        expand("reports/BUSCO/{sample}/platanus_ass/short_summary_{sample}.txt", sample=config["sample"]),
+        expand("reports/BUSCO/{sample}/redundans_platanus/short_summary.specific.nematoda_odb10.redundans_platanus.txt", sample=config["sample"]),
+        expand("reports/BUSCO/{sample}/redundans_platanusgc/short_summary.specific.nematoda_odb10.redundans_platanusgc.txt", sample=config["sample"]),
+        expand("reports/BUSCO/{sample}/redundans_spades/short_summary.specific.nematoda_odb10.redundans_spades.txt", sample=config["sample"]),
+        expand("reports/BUSCO/{sample}/platanus_gapclosed/short_summary.specific.nematoda_odb10.platanus_gapclosed.txt", sample=config["sample"]),
+        expand("reports/BUSCO/{sample}/spades/short_summary.specific.nematoda_odb10.spades.txt", sample=config["sample"]),
+        expand("reports/BUSCO/{sample}/platanus_ass/short_summary.specific.nematoda_odb10.platanus_ass.txt", sample=config["sample"]),
 # quast appraisal
         expand("reports/quast/{sample}/report.tsv", sample=config["sample"])

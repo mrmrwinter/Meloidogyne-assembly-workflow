@@ -30,23 +30,23 @@ rule create_kmcfilelist:
     conda:
         "../envs/characterisation.yaml"
     output:
-        "reports/kmc/kmcfilelist"
-#    shell:"ls data/raw | awk '{{print ""data/raw/""$0}}' - > {output}"
-    shell:"ls data/raw | sed -e 's/^/data\/raw\//' > {output}"
+        "reports/kmc/{sample}/kmcfilelist"
+    shell:
+        "ls data/raw/{sample} | sed -e 's/^/data\/raw\//' > {output}"
 
 
 rule kmc_count:
     conda:
         "../envs/characterisation.yaml"
     input:
-        "reports/kmc/kmcfilelist"
+        "reports/kmc/{sample}/kmcfilelist"
     output:
-        pre = "reports/kmc/kmer_counts.kmc_pre",
-        suf = "reports/kmc/kmer_counts.kmc_suf"
+        pre = "reports/kmc/{sample}/kmer_counts.kmc_pre",
+        suf = "reports/kmc/{sample}/kmer_counts.kmc_suf"
     threads:
         28
     params:
-        kmc = "reports/kmc/kmer_counts"
+        kmc = "reports/kmc/{sample}/kmer_counts"
     shell:
         "rm -rf tmp/ && \
         mkdir tmp/ && \
@@ -65,12 +65,12 @@ rule kmc_transform:
     conda:
         "../envs/characterisation.yaml"
     input:
-        suf = "reports/kmc/kmer_counts.kmc_suf",
-        pre = "reports/kmc/kmer_counts.kmc_pre"
+        suf = "reports/kmc/{sample}/kmer_counts.kmc_suf",
+        pre = "reports/kmc/{sample}/kmer_counts.kmc_pre"
     output:
-        "reports/kmc/kmer_k21.hist"
+        "reports/kmc/{sample}/kmer_k21.hist"
     params:
-        kmc="reports/kmc/kmer_counts"
+        kmc="reports/kmc/{sample}/kmer_counts"
     shell:
         "kmc_tools transform {params.kmc} histogram {output} -cx10000"
 
@@ -93,7 +93,7 @@ rule genomescope:
     output:
         "reports/genomescope/{sample}/plot.log.png"
     params:
-        outdir="reports/genomescope"
+        outdir="reports/genomescope/{sample}/"
     shell:
         "Rscript scripts/genomescope.R {input} 21 150 {params.outdir} 1000 1"
 
@@ -103,5 +103,7 @@ rule smudgeplot:
         "reports/kmc/{sample}/kmer_k21.hist"
     output:
         "reports/smudge/{sample}/smudgeplot_smudgeplot.png"
-    script:
-        "scripts/smudge.sh"
+    params:
+        "{sample}"
+    shell:
+        "bash scripts/smudge.sh"
