@@ -99,11 +99,16 @@ rule genomescope:
 
 #smudgeplot for predicting ploidy
 rule smudgeplot:
+    conda:
+        "../envs/characterisation.yaml"
     input:
         "reports/kmc/{sample}/kmer_k21.hist"
     output:
         "reports/smudge/{sample}/smudgeplot_smudgeplot.png"
     params:
-        "{sample}"
+        counts = "reports/kmc/{sample}/kmer_counts",
+        dump = "reports/smudge/{sample}/kmer_k21.dump",
+        pairs = "reports/smudge/{sample}/kmer_pairs",
+        cov = "reports/smudge/{sample}/kmer_pairs_coverages.tsv"
     shell:
         "bash scripts/smudge.sh"
