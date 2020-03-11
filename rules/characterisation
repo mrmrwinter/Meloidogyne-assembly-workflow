@@ -111,4 +111,19 @@ rule smudgeplot:
         pairs = "reports/smudge/{sample}/kmer_pairs",
         cov = "reports/smudge/{sample}/kmer_pairs_coverages.tsv"
     shell:
-        "bash scripts/smudge.sh"
+        """
+        L=$(smudgeplot.py cutoff {input} L)
+        U=$(smudgeplot.py cutoff {input} U)
+
+        echo $L $U
+
+        kmc_tools transform {params.counts} \
+        -ci$L \
+        -cx$U dump \
+        -s {params.dump}
+
+        smudgeplot.py hetkmers \
+        -o {params.pairs} < {params.dump} \
+
+        smudgeplot.py plot {params.cov}
+        """
